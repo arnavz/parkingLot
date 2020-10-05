@@ -1,0 +1,182 @@
+Parking Lot Assignment <Trademo>
+
+This is a maven based project to simulate a parking lot and its interactions.
+
+Technical Stack-
+
+Language   : Java(JDK 1.7+)
+Frameworks : Spring Boot
+ORM Tech   : JPA Repository(Spring-Data-Jpa)
+Database   : H2(In-memory)
+Build Tool : Maven
+
+Initial Setup - Once Spring Application Context comes up, a parking lot as defined in application.properties is initialized. You may change it according to your use case.
+
+
+parkinglot={"smallSpot":8, "mediumSpot":6, "largeSpot":3}
+
+For this default property, a parking lot with 8 smallspots(relevant for bike), 6 mediumSpots(relevant for cars) and 3 largeSpots(relevant fro trucks) is initialized.
+
+Assumptions:
+
+It is a single level parking lot with different types of parking spots.
+We need to persist the data for future requirements.
+Vehicle of a particular vehicle type should be parked in its associated Parking Spot.
+One Vehicle of a particular type can park at a time
+
+
+API's
+
+1.
+
+"/app/parking/park"
+
+
+    public ResponseEntity parkVehicle(@RequestBody Vehicle vehicle) {
+        return new ResponseEntity(parkingLotManager.park(vehicle), HttpStatus.CREATED);
+    }
+
+
+Input:
+
+
+{   
+    "registrationNumber" : "RQ1224",
+    "color": "RED",
+    "vehicleType": "TRUCK"
+    
+}
+
+Success Response: 
+{
+    "vehicleType": "TRUCK",
+    "slot": 1
+}
+
+2.
+
+"unpark/{registrationNumber}
+    public ResponseEntity unpark(@PathVariable("registrationNumber") String registrationNumber) {
+        return new ResponseEntity(parkingLotManager.unPark(registrationNumber),HttpStatus.ACCEPTED);
+    }
+
+Input registrationNumber
+
+SuccessResponse :
+
+{
+    "registrationNumber": "QW345",
+    "color": "BLUE",
+    "vehicleType": "CAR",
+    "inTime": "2020-09-01T23:35:05.616+0000",
+    "outTime": "2020-09-01T23:55:27.888+0000",
+    "spot": {
+        "vehicleType": "CAR",
+        "slot": 2
+    }
+
+
+"info/{type}/{slot}"
+    public ResponseEntity getSlotInfoByType(@PathVariable("type")String vehicleType, @PathVariable("slot") int slot){
+        return new ResponseEntity(parkingLotManager.getSlotInfoByType(VehicleType.valueOf(vehicleType.toUpperCase()), slot),HttpStatus.ACCEPTED);
+    }
+
+provide the details as per the type and slot number.
+
+
+Input: RequestParams:
+type : vehicle type
+slot: slot number
+
+
+SuccessResponse
+
+{
+    "registrationNumber": "RI882",
+    "color": "RED",
+    "vehicleType": "BIKE",
+    "inTime": "2020-09-02T00:12:59.870+0000",
+    "outTime": null,
+    "spot": {
+        "vehicleType": "BIKE",
+        "slot": 5
+    }
+
+}
+
+"info/color/{color}"
+public ResponseEntity getAllVehiclesByColor(@PathVariable("color") String color){
+        return new ResponseEntity(parkingLotManager.getVehiclesByColor(color),HttpStatus.ACCEPTED);
+    }
+
+Input : RequestParams : color
+
+Successful response: List of vehicles of specified color;
+
+[
+    {
+        "registrationNumber": "BR123",
+        "color": "BLACK",
+        "vehicleType": "CAR",
+        "inTime": "2020-09-02T00:10:52.894+0000",
+        "outTime": null,
+        "spot": {
+            "vehicleType": "CAR",
+            "slot": 1
+        }
+    },
+    {
+        "registrationNumber": "BG987",
+        "color": "BLACK",
+        "vehicleType": "BIKE",
+        "inTime": "2020-09-02T00:11:31.895+0000",
+        "outTime": null,
+        "spot": {
+            "vehicleType": "BIKE",
+            "slot": 1
+        }
+    }
+]
+
+
+ 
+"info/type/{type}"
+    public ResponseEntity getAllVehicleByType(@PathVariable("type") String type){
+        return new ResponseEntity(parkingLotManager.getVehiclesByType(VehicleType.valueOf(type.toUpperCase())), HttpStatus.ACCEPTED);
+    }
+
+Input : RequestParams : TYPE
+
+Successful response: List of vehicles of specified TYPE;
+
+[
+    {
+        "registrationNumber": "BR123",
+        "color": "BLACK",
+        "vehicleType": "CAR",
+        "inTime": "2020-09-02T00:10:52.894+0000",
+        "outTime": null,
+        "spot": {
+            "vehicleType": "CAR",
+            "slot": 1
+        }
+    },
+    {
+        "registrationNumber": "BG987",
+        "color": "BLACK",
+        "vehicleType": "BIKE",
+        "inTime": "2020-09-02T00:11:31.895+0000",
+        "outTime": null,
+        "spot": {
+            "vehicleType": "BIKE",
+            "slot": 1
+        }
+    }
+]
+
+
+
+
+
+
+
